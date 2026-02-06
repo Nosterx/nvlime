@@ -30,6 +30,8 @@
 
 ;;; string -> ?number
 (fn flags->kind [flags]
+  (when (not= (type flags) :string)
+    (return nil))
   (local kinds {})
   (for [i 1 (length flags)]
     (let [kind (. flag-kind (flags:sub i i))]
@@ -50,9 +52,10 @@
 (local get-lsp-kind
        (if +fuzzy?+
            (fn [item]
-             (let [flags (. item 4)]
+             (let [flags (. item 2)
+                   flags-str (when (= (type flags) :string) flags)]
                {:label (psl.first item)
-               :labelDetails {:detail flags}
+               :labelDetails {:detail flags-str}
                :kind (or (flags->kind flags)
                          lsp-types.CompletionItemKind.Keyword)}))
            #{:label $}))
